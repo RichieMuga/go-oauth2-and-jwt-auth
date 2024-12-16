@@ -1,0 +1,26 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server for a Gin application.
+  title: Gin Swagger Go-gin-template
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: Returns a "pong" response to test the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ping example
+      tags:
+      - Test Api
+swagger: "2.0"
