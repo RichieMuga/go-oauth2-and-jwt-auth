@@ -33,6 +33,6 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB) {
 		userController := controllers.NewUserController(userRepo)
 		
 		// User routes
-		v1.POST("/signup", userController.CreateUser)
+		v1.POST("/signup", userController.SignUp)
 	}
 }
