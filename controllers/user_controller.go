@@ -16,8 +16,8 @@ type UserController struct {
 	UserRepo adapters.UserRepository
 }
 
-// CreateUser handles creation of the user
-func (c *UserController) CreateUser(ctx *gin.Context) {
+// SignUp handles sign up of a user
+func (c *UserController) SignUp(ctx *gin.Context) {
 	var userDto dto.CreateUserRequestDto
 
 	// Validate request recieved
@@ -53,3 +53,5 @@ func NewUserController(userRepo adapters.UserRepository) *UserController {
 		UserRepo: userRepo,
 	}
 }
+
+
