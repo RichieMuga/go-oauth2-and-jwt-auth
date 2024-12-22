@@ -23,6 +23,9 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB) {
     // Initialize testing route
 		v1.GET("/ping", controllers.Ping)
 
+    // Initialize refresh token
+    v1.GET("/refresh", controllers.RefreshToken)
+
     // Initialize protected route testing
     authenticated.GET("/protectedRoute", controllers.ProtectedRoute)
 		
