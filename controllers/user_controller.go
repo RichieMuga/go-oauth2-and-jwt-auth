@@ -36,15 +36,22 @@ func (c *UserController) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	// Generate token using jwt
-	token, err := auth.GenerateJWT(userID, newUser.Email)
+	// Generate access_Token using jwt
+	accessToken, err := auth.GenerateJWTaccess(userID, newUser.Email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	// Generate refresh_Token using jwt
+	refreshToken, err := auth.GenerateJWTaccess(userID, newUser.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
 
 	// Respond with success and token
-	ctx.JSON(http.StatusCreated, gin.H{"message": "Account created successfully", "token": token})
+  ctx.JSON(http.StatusCreated, gin.H{"message": "Account created successfully", "access_token": accessToken, "refresh_token": refreshToken})
 }
 
 // NewUserController contains the constructor from the UserContoller
@@ -53,5 +60,3 @@ func NewUserController(userRepo adapters.UserRepository) *UserController {
 		UserRepo: userRepo,
 	}
 }
-
-

@@ -13,15 +13,27 @@ import (
 // secretKey gotten from the env
 var secretKey = os.Getenv("JWT_SECRET")
 
-// GenerateJWT creates a token based on incoming request body
-func GenerateJWT(email string, userID string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+// GenerateJWTaccess access_token creates a token based on incoming request body
+func GenerateJWTaccess(email string, userID string) (string, error) {
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":  email,
 		"userId": userID,
 		"exp":    time.Now().Add(time.Hour * 2).Unix(),
+    "type":"access",
 	})
 
-	return token.SignedString([]byte(secretKey))
+	return accessToken.SignedString([]byte(secretKey))
+}
+
+// GenerateJWTrefresh refresh_token
+func GenerateJWTrefresh(email string, userID string) (string, error){
+  refreshToken := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"email":  email,
+		"userId": userID,
+		"exp":    time.Now().Add(time.Hour * 730).Unix(),
+    "type": "refresh",
+  })
+  return refreshToken.SignedString([]byte(secretKey))
 }
 
 // VerifyToken verifies jwt token
