@@ -44,7 +44,7 @@ func (c *UserController) SignUp(ctx *gin.Context) {
 	}
 
 	// Generate refresh_Token using jwt
-	refreshToken, err := auth.GenerateJWTaccess(userID, newUser.Email)
+	refreshToken, err := auth.GenerateJWTrefresh(userID, newUser.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
