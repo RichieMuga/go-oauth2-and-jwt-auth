@@ -36,10 +36,10 @@ func GetUserByEmail(db *gorm.DB, email string) (*User, error) {
 	return &user, nil
 }
 
-// GetUserById gets user by email
-func GetUserById(db *gorm.DB, userId string) (*User, error) {
+// GetUserByID gets user by email
+func GetUserByID(db *gorm.DB, userID string) (*User, error) {
 	var user User
-	if err := db.Where("ID = ?", userId).First(&user).Error; err != nil {
+	if err := db.Where("ID = ?", userID).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
