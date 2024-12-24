@@ -18,7 +18,7 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB) {
 
     // add protected routes setup
     authenticated := v1.Group("/")
-    authenticated.Use(middlewares.Authenticate)
+    authenticated.Use(middlewares.AccessTokenMiddleware)
 
     // Initialize testing route
 		v1.GET("/ping", controllers.Ping)
