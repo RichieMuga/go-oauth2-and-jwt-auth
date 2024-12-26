@@ -37,5 +37,6 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB) {
 		
 		// User routes
 		v1.POST("/signup", userController.SignUp)
+    v1.POST("/signin", userController.SignIn)
 	}
 }
