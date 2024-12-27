@@ -4,6 +4,9 @@ package controllers
 import (
 	"net/http"
 
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+
 	"github.com/RichieMuga/go-gin-template/dto"
 	"github.com/RichieMuga/go-gin-template/internal/adapters"
 	auth "github.com/RichieMuga/go-gin-template/pkg/authentication"
@@ -14,6 +17,7 @@ import (
 // UserController handles incoming and out
 type UserController struct {
 	UserRepo adapters.UserRepository
+  DB *gorm.DB
 }
 
 // SignUp handles sign up of a user
@@ -44,7 +48,7 @@ func (c *UserController) SignUp(ctx *gin.Context) {
 	}
 
 	// Generate refresh_Token using jwt
-	refreshToken, err := auth.GenerateJWTaccess(userID, newUser.Email)
+	refreshToken, err := auth.GenerateJWTrefresh(userID, newUser.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
@@ -52,6 +56,30 @@ func (c *UserController) SignUp(ctx *gin.Context) {
 
 	// Respond with success and token
   ctx.JSON(http.StatusCreated, gin.H{"message": "Account created successfully", "access_token": accessToken, "refresh_token": refreshToken})
+}
+
+// SignIn handles user authentication by validating credentials against the database.
+func (c *UserController) SignIn(ctx *gin.Context) {
+    var loginDto dto.LoginUserRequestDto
+    
+    if err := ctx.ShouldBindJSON(&loginDto); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+        return
+    }
+
+    // Use the repository instead of direct DB access
+    user, err := c.UserRepo.GetUserByEmail(loginDto.Email)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginDto.Password)); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    ctx.JSON(http.StatusAccepted, gin.H{"success": "Logged in successfully"})
 }
 
 // NewUserController contains the constructor from the UserContoller

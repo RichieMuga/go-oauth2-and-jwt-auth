@@ -1,70 +1,75 @@
-// Package auth jwt is an implementation of jwt authentication
-package auth
+// Package authentication contains jwt signing and verification functions
+package authentication
 
 import (
-	"errors"
-	"fmt"
-	"os"
-	"time"
-
-	"github.com/golang-jwt/jwt/v5"
+    "errors"
+    "fmt"
+    "os"
+    "time"
+    "github.com/golang-jwt/jwt/v5"
 )
 
-// secretKey gotten from the env
 var secretKey = os.Getenv("JWT_SECRET")
 
-// GenerateJWTaccess access_token creates a token based on incoming request body
+// GenerateJWTaccess creates an access token
 func GenerateJWTaccess(email string, userID string) (string, error) {
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":  email,
-		"userId": userID,
-		"exp":    time.Now().Add(time.Hour * 2).Unix(),
-    "type":"access",
-	})
-
-	return accessToken.SignedString([]byte(secretKey))
+    accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "email":  email,
+        "userId": userID,
+        "exp":    time.Now().Add(time.Hour * 2).Unix(),
+        "type":   "access",
+    })
+    return accessToken.SignedString([]byte(secretKey))
 }
 
-// GenerateJWTrefresh refresh_token
-func GenerateJWTrefresh(email string, userID string) (string, error){
-  refreshToken := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-		"email":  email,
-		"userId": userID,
-		"exp":    time.Now().Add(time.Hour * 730).Unix(),
-    "type": "refresh",
-  })
-  return refreshToken.SignedString([]byte(secretKey))
+// GenerateJWTrefresh creates a refresh token
+func GenerateJWTrefresh(email string, userID string) (string, error) {
+    refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "email":  email,
+        "userId": userID,
+        "exp":    time.Now().Add(time.Hour * 730).Unix(),
+        "type":   "refresh",
+    })
+    return refreshToken.SignedString([]byte(secretKey))
 }
 
-// VerifyToken verifies jwt token
-func VerifyToken(token string) (int64, error) {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+// VerifyToken verifies the token
+func VerifyToken(tokenString string) (string, string, string, error) {
+    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        if token.Method != jwt.SigningMethodHS256 {
+            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+        }
+        return []byte(secretKey), nil
+    })
 
-		if !ok {
-			return nil, errors.New("unexpected signing method")
-		}
 
-		return []byte(secretKey), nil
-	})
+    if err != nil {
+        return "", "","", fmt.Errorf("failed to parse token: %w", err)
+    }
 
-	if err != nil {
-		fmt.Println("Could not parse tokens")
-		return 0, errors.New("could not parse tokens")
-	}
+    if !token.Valid {
+        return "", "", "", errors.New("invalid token")
+    }
 
-	tokenIsValid := parsedToken.Valid
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok {
+        return "", "", "", errors.New("invalid claims format")
+    }
 
-	if !tokenIsValid {
-		return 0, errors.New("invalid tokens")
-	}
+    userID, ok := claims["userId"].(string)
+    if !ok {
+        return "", "","",  errors.New("invalid userID claim")
+    }
 
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+    tokenType, ok := claims["type"].(string)
+    if !ok {
+        return "", "", "", errors.New("invalid token type claim")
+    }
 
-	if !ok {
-		return 0, errors.New("invalid tokens claims")
-	}
+    email, ok := claims["email"].(string)
+    if !ok{
+        return "","","",  errors.New("invalid email claim")
+  }
 
-	userID := int64(claims["userID"].(float64))
-	return userID, nil
-} 
+    return userID, tokenType, email, nil
+}

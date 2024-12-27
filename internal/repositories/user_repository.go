@@ -18,7 +18,7 @@ type UserRepo struct {
 func (u *UserRepo) CreateUser(user *models.User) (string ,error) {
   
   // hash user password
-	hashedPassword, err := hash.HashPassword(user.Password)
+	hashedPassword, err := hash.EncryptPassword(user.Password)
 	if err != nil {
 		return "",err 
 	}
@@ -33,6 +33,15 @@ func (u *UserRepo) CreateUser(user *models.User) (string ,error) {
 
   // return the userId only
 	return user.ID,nil
+}
+
+// GetUserByEmail gets the email from db
+func (u *UserRepo) GetUserByEmail(email string) (*models.User, error) {
+    var user models.User
+    if err := u.db.Where("email = ?", email).First(&user).Error; err != nil {
+        return nil, err
+    }
+    return &user, nil
 }
 
 

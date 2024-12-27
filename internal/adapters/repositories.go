@@ -8,4 +8,5 @@ import (
 // UserRepository defines the interface for user-related database operations
 type UserRepository interface {
 	CreateUser(user *models.User) (string, error)
+  GetUserByEmail(email string) (*models.User, error)
 }

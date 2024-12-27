@@ -10,3 +10,9 @@ type CreateUserRequestDto struct {
     LastName    string `json:"last_name" binding:"required"`
     PhoneNumber string `json:"phone_number" binding:"required"`
 }
+
+// LoginUserRequestDto defines incoming request for login dto
+type LoginUserRequestDto struct {
+  Email         string `json:"email" binding:"required"`
+  Password      string `json:"password" binding:"required"`
+}
