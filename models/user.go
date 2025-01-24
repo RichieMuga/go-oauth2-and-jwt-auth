@@ -23,7 +23,7 @@ type User struct {
 }
 
 // BeforeCreate hook to generate UUID before insert
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+func (u *User) BeforeCreate(_ *gorm.DB) (err error) {
 	u.ID = uuid.New().String() // Generate UUID and store it as string
 	return
 }
