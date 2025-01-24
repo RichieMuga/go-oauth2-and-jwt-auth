@@ -1,5 +1,5 @@
-// Package controllers contains handlers/controllers incoming and outgoing http requests
-package controllers
+// Package auth contains handlers/controllers for authentication and authorization
+package auth
 
 import (
 	"net/http"
@@ -14,14 +14,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserController handles incoming and out
-type UserController struct {
-	UserRepo adapters.UserRepository
+// Controller handles the initialization of the auth controller
+type Controller struct {
+  AuthRepo adapters.AuthRepository
 	DB       *gorm.DB
 }
 
 // SignUp handles sign up of a user
-func (c *UserController) SignUp(ctx *gin.Context) {
+func (c *Controller) SignUp(ctx *gin.Context) {
 	var userDto dto.CreateUserRequestDto
 
 	// Validate request recieved
@@ -34,7 +34,7 @@ func (c *UserController) SignUp(ctx *gin.Context) {
 	newUser := utils.MapUserDTOtoModel(userDto)
 
 	// Assign the return types expected after CreateUser
-	userID, err := c.UserRepo.CreateUser(newUser)
+	userID, err := c.AuthRepo.CreateUser(newUser)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -59,7 +59,7 @@ func (c *UserController) SignUp(ctx *gin.Context) {
 }
 
 // SignIn handles user authentication by validating credentials against the database.
-func (c *UserController) SignIn(ctx *gin.Context) {
+func (c *Controller) SignIn(ctx *gin.Context) {
 	var loginDto dto.LoginUserRequestDto
 
 	if err := ctx.ShouldBindJSON(&loginDto); err != nil {
@@ -68,7 +68,7 @@ func (c *UserController) SignIn(ctx *gin.Context) {
 	}
 
 	// Use the repository instead of direct DB access
-	user, err := c.UserRepo.GetUserByEmail(loginDto.Email)
+	user, err := c.AuthRepo.GetUserByEmail(loginDto.Email)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -98,9 +98,9 @@ func (c *UserController) SignIn(ctx *gin.Context) {
 
 }
 
-// NewUserController contains the constructor from the UserContoller
-func NewUserController(userRepo adapters.UserRepository) *UserController {
-	return &UserController{
-		UserRepo: userRepo,
+// NewAuthController contains the constructor from the UserContoller
+func NewAuthController(authRepo adapters.AuthRepository) *Controller {
+	return &Controller{
+		AuthRepo: authRepo,
 	}
 }

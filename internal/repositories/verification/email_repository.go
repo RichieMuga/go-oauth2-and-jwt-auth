@@ -1,15 +1,20 @@
-package repositories
+// Package verification contains email and mobile phone verification
+package verification
 
 import (
 	"github.com/RichieMuga/go-gin-template/internal/adapters"
+	"github.com/RichieMuga/go-gin-template/internal/repositories"
 	"github.com/RichieMuga/go-gin-template/models"
+
 	"gorm.io/gorm"
 )
 
+// EmailRepo declares ethod signatures
 type EmailRepo struct {
-	*BaseRepo
+	*repositories.BaseRepo
 }
 
+// GetIsEmailVerified from db
 func (e *EmailRepo) GetIsEmailVerified(email string) (bool,error)  {
   // Assign user variable to user.model
   var user models.User
@@ -22,7 +27,7 @@ func (e *EmailRepo) GetIsEmailVerified(email string) (bool,error)  {
   return user.IsVerified, nil
 }
 
-// NewUserRepository creates a new instance of EmailRepo.
+// NewEmailRepository creates a new instance of EmailRepo.
 func NewEmailRepository(db *gorm.DB) adapters.EmailRepository {
-	return &EmailRepo{BaseRepo: NewBaseRepo(db)}
+	return &EmailRepo{BaseRepo: repositories.NewBaseRepo(db)}
 }

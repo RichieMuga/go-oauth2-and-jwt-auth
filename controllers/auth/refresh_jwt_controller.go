@@ -1,4 +1,4 @@
-package controllers
+package auth
 
 import (
 
@@ -40,10 +40,6 @@ func RefreshToken(ctx *gin.Context) {
 	// Ensure the token type is "refresh"
 	if tokenType != "refresh" {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token type for refresh"})
-		return
-	}
-  	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 

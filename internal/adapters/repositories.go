@@ -5,8 +5,8 @@ import (
 	"github.com/RichieMuga/go-gin-template/models"
 )
 
-// UserRepository defines the interface for user-related database operations
-type UserRepository interface {
+// AuthRepository defines the interface for user-related database operations
+type AuthRepository interface {
 	CreateUser(user *models.User) (string, error)
   GetUserByEmail(email string) (*models.User, error)
 }

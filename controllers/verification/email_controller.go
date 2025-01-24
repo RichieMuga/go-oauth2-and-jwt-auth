@@ -1,5 +1,5 @@
-// Package controllers contains controller in mvc design
-package controllers
+// Package verification contains controller for email verification
+package verification
 
 import (
 	"net/http"
@@ -10,12 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// EmailController describes the Email controller important params
 type EmailController struct {
 	EmailRepo adapters.EmailRepository
 	DB        *gorm.DB
 }
 
-// checks if email is verified
+// IsEmailVerified checks if email is verified
 func (c *EmailController) IsEmailVerified(ctx *gin.Context) {
 	// type for the email verification
 	var emailDTO dto.EmailVerificationRequest
@@ -36,7 +37,7 @@ func (c *EmailController) IsEmailVerified(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, gin.H{"isVerified": isVerified})
 }
 
-// NewEmail contains the constructor from the EmailContoller
+// NewEmailController contains the constructor from the EmailContoller
 func NewEmailController(emailRepo adapters.EmailRepository) *EmailController {
 	return &EmailController{
 		EmailRepo: emailRepo,
