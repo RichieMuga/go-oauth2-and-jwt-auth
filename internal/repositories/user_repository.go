@@ -9,43 +9,41 @@ import (
 	"gorm.io/gorm"
 )
 
-// UserRepo used for dependancy injection incase one want to test or change storage
+// UserRepo is used for dependency injection in case one wants to test or change storage.
 type UserRepo struct {
-	db *gorm.DB
+	*BaseRepo
 }
 
 // CreateUser implements Repository.
-func (u *UserRepo) CreateUser(user *models.User) (string ,error) {
-  
-  // hash user password
+func (u *UserRepo) CreateUser(user *models.User) (string, error) {
+	// Hash user password
 	hashedPassword, err := hash.EncryptPassword(user.Password)
 	if err != nil {
-		return "",err 
+		return "", err
 	}
-  
-  // change the password object field password value to the hashed password
-  user.Password = string(hashedPassword)
+
+	// Change the password object field password value to the hashed password
+	user.Password = string(hashedPassword)
 
 	// Save the user in the database
-	if err := u.db.Create(user).Error; err != nil {
-		return "",err
-	}
+	if err := u.DB().Create(user).Error; err != nil {
+		return "", err
+  }
 
-  // return the userId only
-	return user.ID,nil
+	// Return the userId only
+	return user.ID, nil
 }
 
-// GetUserByEmail gets the email from db
+// GetUserByEmail gets the user by email from the database.
 func (u *UserRepo) GetUserByEmail(email string) (*models.User, error) {
-    var user models.User
-    if err := u.db.Where("email = ?", email).First(&user).Error; err != nil {
-        return nil, err
-    }
-    return &user, nil
+	var user models.User
+	if err := u.DB().Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
-
 
 // NewUserRepository creates a new instance of UserRepo.
 func NewUserRepository(db *gorm.DB) adapters.UserRepository {
-	return &UserRepo{db: db}
+	return &UserRepo{BaseRepo: NewBaseRepo(db)}
 }
