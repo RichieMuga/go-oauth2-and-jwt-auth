@@ -10,3 +10,8 @@ type UserRepository interface {
 	CreateUser(user *models.User) (string, error)
   GetUserByEmail(email string) (*models.User, error)
 }
+
+// EmailRepository defines the interface for email-related operation
+type EmailRepository interface{
+  GetIsEmailVerified(email string) (bool, error)
+}
