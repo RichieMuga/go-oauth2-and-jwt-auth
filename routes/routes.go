@@ -3,7 +3,10 @@ package routes
 
 import (
 	"github.com/RichieMuga/go-gin-template/controllers"
-	"github.com/RichieMuga/go-gin-template/internal/repositories"
+  "github.com/RichieMuga/go-gin-template/controllers/auth"
+  emailController "github.com/RichieMuga/go-gin-template/controllers/verification"
+	"github.com/RichieMuga/go-gin-template/internal/repositories/verification"
+  authRepo "github.com/RichieMuga/go-gin-template/internal/repositories/auth"
 	"github.com/RichieMuga/go-gin-template/routes/middlewares"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -24,23 +27,23 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB) {
 		v1.GET("/ping", controllers.Ping)
 
     // Initialize refresh token
-    v1.GET("/refresh", controllers.RefreshToken)
+    v1.GET("/refresh", auth.RefreshToken)
 
     // Initialize protected route testing
     authenticated.GET("/protectedRoute", controllers.ProtectedRoute)
 		
-		// Initialize the UserRepository using the DB instance
-		userRepo := repositories.NewUserRepository(db)
+		// Initialize the AuthRepository using the DB instance
+		userRepo := authRepo.NewAuthRepository(db)
 		
 		// Initialize the UserController with the userRepo instance
-		userController := controllers.NewUserController(userRepo)
+		userController := auth.NewAuthController(userRepo)
 	
 
     // Initialize the EmailRepository
-    emailRepo := repositories.NewEmailRepository(db)
+    emailRepo := verification.NewEmailRepository(db)
 
     // Initialize the EmailController
-    emailController := controllers.NewEmailController(emailRepo)
+    emailController := emailController.NewEmailController(emailRepo)
 
 		// User routes
 		v1.POST("/signup", userController.SignUp)
