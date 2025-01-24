@@ -34,9 +34,19 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB) {
 		
 		// Initialize the UserController with the userRepo instance
 		userController := controllers.NewUserController(userRepo)
-		
+	
+
+    // Initialize the EmailRepository
+    emailRepo := repositories.NewEmailRepository(db)
+
+    // Initialize the EmailController
+    emailController := controllers.NewEmailController(emailRepo)
+
 		// User routes
 		v1.POST("/signup", userController.SignUp)
     v1.POST("/signin", userController.SignIn)
+
+    // Email routes
+    v1.POST("/emailVerify", emailController.IsEmailVerified)
 	}
 }

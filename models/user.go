@@ -17,6 +17,7 @@ type User struct {
 	PhoneNumber string
 	Password    string
 	IsActive    bool `gorm:"default:false"`
+  IsVerified  bool `gorm:"default:false"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
